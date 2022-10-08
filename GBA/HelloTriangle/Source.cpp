@@ -10,6 +10,8 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
+#include <fstream>
+
 
 using namespace std;
 //--------------------------------BIBLIOTECA--------------------------
@@ -24,9 +26,9 @@ using namespace std;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 //------------------------VARIAVEIS DO GBA-----------------------------------------------
-#define MAX_X 4
-#define MAX_Y 4
-#define MAX_Z 4
+#define MAX_X 10
+#define MAX_Y 10
+#define MAX_Z 10
 #define MAX_CORES 10
 
 bool BlocoPintado = false;
@@ -34,6 +36,9 @@ int taPintado[MAX_X][MAX_Y][MAX_Z];
 int CursorPosition[MAX_X][MAX_Y][MAX_Z];
 int Grid[MAX_X][MAX_Y][MAX_Z];
 int indiceCor=2; // inicializando a cor com vermelho
+
+ifstream Load;
+ofstream Save;
 
 glm::vec3 posVoxelCursor = glm::vec3(0, 0, 0);
 glm::vec4 paletaCores[MAX_CORES]
@@ -58,7 +63,8 @@ void desenharCursor();
 void inicializarGrid();
 void desenharGrid();
 void addVox();
-
+void SalvarDesenho();
+void LoadDesenho();
 
 float  Xpos = 0.0f, Ypos = 0.0f, Zpos = 3.0f;
 
@@ -90,7 +96,7 @@ void updateCameraPos(GLFWwindow* window);
 int setupGeometry();
 // Dimensões da janela (pode ser alterado em tempo de execução)
 
-
+using namespace std;
 
 
 // Função MAIN
@@ -297,6 +303,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
+	if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) 
+	{
+		Grid[(int)Xpos][(int)Ypos][(int)Zpos] = -1;
+		taPintado[(int)Xpos][(int)Ypos][(int)Zpos] = 0;
+
+	}
 	if (key == GLFW_KEY_W && action == GLFW_PRESS) 
 	{
 		//LIMITANDO A GRID
@@ -460,6 +472,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 	{
 		indiceCor = 1;//verde
+	}
+	//-------------------------------------------------------------SAVE---------------------------
+	if (key == GLFW_KEY_P && action == GLFW_PRESS) 
+	{
+		SalvarDesenho();
+	}
+	if (key == GLFW_KEY_O && action == GLFW_PRESS)
+	{
+		LoadDesenho();
 	}
 }
 
@@ -639,6 +660,56 @@ void desenharCursor()
 
 	//desenhar os voxels
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+}
+void SalvarDesenho() 
+{
+	
+	Save.open("VoxelSave.txt");
+
+	for (int x = 0; x < MAX_X; x++)
+	{
+		for (int y = 0; y < MAX_Y; y++)
+		{
+			for (int z = 0; z < MAX_Z; z++)
+			{
+				Save << Grid[x][y][z] << endl;;
+
+			}
+		}
+	}
+
+	Save.close();
+
+	
+}
+void LoadDesenho() 
+{
+	Load.open("VoxelSave.txt");
+	
+	if (Load.is_open())
+	{
+		
+		for (int x = 0; x < MAX_X; x++)
+		{
+			for (int y = 0; y < MAX_Y; y++)
+			{
+				for (int z = 0; z < MAX_Z; z++)
+				{
+					Load >> Grid[x][y][z];
+
+					taPintado[x][y][z] = Grid[x][y][z];
+				}
+			}
+		}
+	}
+	else
+	{ 
+	cout << "problema em abrir o arquivo" << endl; 
+	
+	}
+	Load.close();
+
+	
 }
 
 
