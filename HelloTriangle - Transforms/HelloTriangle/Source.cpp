@@ -121,7 +121,7 @@ int main()
 
 		
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_POINTS, 0, 300);
+		glDrawArrays(GL_TRIANGLES, 0, 300);
 
 
 		
@@ -166,8 +166,8 @@ int setupGeometry()
 	for (int i = 0; i <= 300; i++)
 	{
 
-		vertices[i] = cos(i);
-		vertices[i + 1] = cos(i);
+		vertices[i] = sin(i);//x
+		vertices[i + 1] = -sin(i);//y
 		if (i <= 298) {
 			vertices[i + 2] = 0.0f;
 		}
